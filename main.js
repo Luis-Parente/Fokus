@@ -34,7 +34,7 @@ btnFoco.addEventListener('click', () => {
 })
 
 btnCurto.addEventListener('click', () => {
-    tempoDecorridoEmSegundos = 5;
+    tempoDecorridoEmSegundos = 300;
     finalizarContagem();
     alterarContexto('descanso-curto');
     btnCurto.classList.add('active');
