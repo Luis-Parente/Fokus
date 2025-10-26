@@ -14,17 +14,35 @@ const toggleMusica = document.querySelector('#alternar-musica');
 const musicaDeFundo = new Audio('./sons/luna-rise-part-one.mp3');
 musicaDeFundo.loop = true;
 
+const btnStartPause = document.querySelector('#start-pause')
+
+let intervaloId = null;
+
+let tempoDecorridoEmSegundos = 1500;
+
+const musicaIniciar = new Audio('./sons/play.wav');
+const musicaPausar = new Audio('./sons/pause.mp3');
+const musicaContagemFinalizada = new Audio('./sons/beep.mp3');
+
+const tempoNaTela = document.querySelector('#timer');
+
 btnFoco.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 1500;
+    finalizarContagem();
     alterarContexto('foco');
     btnFoco.classList.add('active');
 })
 
 btnCurto.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 5;
+    finalizarContagem();
     alterarContexto('descanso-curto');
     btnCurto.classList.add('active');
 })
 
 btnLongo.addEventListener('click', () => {
+    tempoDecorridoEmSegundos = 900;
+    finalizarContagem();
     alterarContexto('descanso-longo');
     btnLongo.classList.add('active');
 })
@@ -38,6 +56,7 @@ toggleMusica.addEventListener('change', () => {
 })
 
 function alterarContexto (contexto) {
+    mostrarTempoNaTela();
     html.setAttribute('data-contexto', contexto);
     imagemBanner.setAttribute('src', `./imagens/${contexto}.png`);
 
@@ -60,3 +79,43 @@ function alterarContexto (contexto) {
             break;
     }
 }
+
+function iniciarOuPausarContagem() {
+    if(intervaloId) {
+        musicaPausar.play() 
+        finalizarContagem();
+        return
+    }
+    btnStartPause.innerHTML = `<img class="app__card-primary-butto-icon" src="/imagens/pause.png" alt="">
+                                <span>Pausar</span>`;
+    musicaIniciar.play();
+    intervaloId = setInterval(contagemRegressiva, 1000);
+}
+
+function finalizarContagem() {
+    btnStartPause.innerHTML = `<img class="app__card-primary-butto-icon" src="/imagens/play_arrow.png" alt="">
+                                <span>Começar</span>`;
+    clearInterval(intervaloId);
+    intervaloId = null;
+}
+
+const contagemRegressiva = () => {
+    if (tempoDecorridoEmSegundos <= 0) {
+        musicaContagemFinalizada.play();
+        finalizarContagem();
+        return
+    }
+
+    tempoDecorridoEmSegundos -= 1;
+    mostrarTempoNaTela();
+}
+
+btnStartPause.addEventListener('click', iniciarOuPausarContagem);
+
+function mostrarTempoNaTela(){
+    const tempo = new Date(tempoDecorridoEmSegundos * 1000);
+    const tempoFormatado = tempo.toLocaleTimeString('pt-br', {minute: '2-digit', second: '2-digit'});
+    tempoNaTela.innerHTML = `${tempoFormatado}`;    
+}
+
+mostrarTempoNaTela();
